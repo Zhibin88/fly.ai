@@ -514,6 +514,8 @@
     "waiting": "第 {epoch} 週處於等待期，可從 {when} 起領取。每次分紅都會等待，以便在任何人領取前完成核查。",
     "nothingYet": "這個錢包還沒有分紅。只有已啟用的蒼蠅參與分配。",
     "notActive": "你最新的分紅尚未生效。等待期結束後再來。",
+    "closesAt": "請在 {when} 之前領取第 #{epoch} 週。屆時未領取的部分將退回 Fly Desk。",
+    "closed": "第 #{epoch} 週的領取已於 {when} 截止。未領取的部分已退回 Fly Desk。",
     "th": {
       "fly": "蒼蠅",
       "rarity": "稀有度",
@@ -530,7 +532,8 @@
     "why": {
       "BadProof": "此證明尚未符合當前分紅。最新一週可能仍在等待期。",
       "NothingToClaim": "沒有新的可領取：這個錢包已全部領取。",
-      "OverOwed": "分紅合約拒絕了此次領取。請告訴我們。"
+      "OverOwed": "分紅合約拒絕了此次領取。請告訴我們。",
+      "ClaimClosed": "本週的領取期限已過。未領取的部分已退回 Fly Desk。"
     }
   },
   "odds": {

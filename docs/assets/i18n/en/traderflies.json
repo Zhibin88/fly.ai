@@ -516,6 +516,8 @@
     "waiting": "Week #{epoch} is in its waiting period and can be claimed from {when}. Every payout waits so it can be checked before anyone claims.",
     "nothingYet": "This wallet has nothing in the payouts yet. Only activated flies share in them.",
     "notActive": "Your newest payout isn't active yet. Come back after its waiting period.",
+    "closesAt": "Claim week #{epoch} before {when}. What isn't claimed by then goes back to the Fly Desk.",
+    "closed": "Claims for week #{epoch} closed at {when}. What wasn't claimed went back to the Fly Desk.",
     "th": {
       "fly": "Fly",
       "rarity": "Rarity",
@@ -532,7 +534,8 @@
     "why": {
       "BadProof": "This proof doesn't match the active payout yet. The newest week may still be in its waiting period.",
       "NothingToClaim": "Nothing new to claim: this wallet has claimed everything so far.",
-      "OverOwed": "The payout contract refused this claim. Please tell us."
+      "OverOwed": "The payout contract refused this claim. Please tell us.",
+      "ClaimClosed": "This week's claim window has closed. What wasn't claimed went back to the Fly Desk."
     }
   },
   "odds": {

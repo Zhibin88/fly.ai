@@ -516,6 +516,8 @@
     "waiting": "La semana #{epoch} está en su periodo de espera y se puede cobrar desde {when}. Cada pago espera para poder revisarse antes de que nadie cobre.",
     "nothingYet": "Esta wallet aún no tiene nada en los pagos. Solo las moscas activadas participan.",
     "notActive": "Tu pago más reciente aún no está activo. Vuelve tras su periodo de espera.",
+    "closesAt": "Cobra la semana #{epoch} antes del {when}. Lo que no se cobre para entonces vuelve al Fly Desk.",
+    "closed": "Los cobros de la semana #{epoch} cerraron el {when}. Lo que no se cobró volvió al Fly Desk.",
     "th": {
       "fly": "Mosca",
       "rarity": "Rareza",
@@ -532,7 +534,8 @@
     "why": {
       "BadProof": "Esta prueba aún no coincide con el pago activo. La semana más reciente puede seguir en su periodo de espera.",
       "NothingToClaim": "Nada nuevo que cobrar: esta wallet ya cobró todo.",
-      "OverOwed": "El contrato de pagos rechazó este cobro. Avísanos, por favor."
+      "OverOwed": "El contrato de pagos rechazó este cobro. Avísanos, por favor.",
+      "ClaimClosed": "El plazo para cobrar esta semana ya cerró. Lo que no se cobró volvió al Fly Desk."
     }
   },
   "odds": {

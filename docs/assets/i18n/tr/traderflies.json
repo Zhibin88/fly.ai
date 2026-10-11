@@ -516,6 +516,8 @@
     "waiting": "{epoch}. hafta bekleme süresinde ve {when} itibarıyla alınabilir. Her ödeme, kimse almadan önce kontrol edilebilsin diye bekler.",
     "nothingYet": "Bu cüzdanın ödemelerde henüz bir şeyi yok. Yalnızca aktive edilmiş sinekler pay alır.",
     "notActive": "En yeni ödemen henüz aktif değil. Bekleme süresinden sonra gel.",
+    "closesAt": "#{epoch}. haftayı {when} tarihinden önce al. O zamana kadar alınmayan kısım Fly Desk'e geri döner.",
+    "closed": "#{epoch}. haftanın talepleri {when} tarihinde kapandı. Alınmayan kısım Fly Desk'e geri döndü.",
     "th": {
       "fly": "Sinek",
       "rarity": "Nadirlik",
@@ -532,7 +534,8 @@
     "why": {
       "BadProof": "Bu kanıt henüz aktif ödemeyle eşleşmiyor. En yeni hafta hâlâ bekleme süresinde olabilir.",
       "NothingToClaim": "Alınacak yeni bir şey yok: bu cüzdan her şeyi aldı.",
-      "OverOwed": "Ödeme sözleşmesi bu talebi reddetti. Lütfen bize haber ver."
+      "OverOwed": "Ödeme sözleşmesi bu talebi reddetti. Lütfen bize haber ver.",
+      "ClaimClosed": "Bu haftanın talep süresi kapandı. Alınmayan kısım Fly Desk'e geri döndü."
     }
   },
   "odds": {

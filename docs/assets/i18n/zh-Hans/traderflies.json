@@ -514,6 +514,8 @@
     "waiting": "第 {epoch} 周处于等待期，可从 {when} 起领取。每次分红都会等待，以便在任何人领取前完成核查。",
     "nothingYet": "这个钱包还没有分红。只有已激活的苍蝇参与分配。",
     "notActive": "你最新的分红尚未生效。等待期结束后再来。",
+    "closesAt": "请在 {when} 之前领取第 #{epoch} 周。届时未领取的部分将退回 Fly Desk。",
+    "closed": "第 #{epoch} 周的领取已于 {when} 截止。未领取的部分已退回 Fly Desk。",
     "th": {
       "fly": "苍蝇",
       "rarity": "稀有度",
@@ -530,7 +532,8 @@
     "why": {
       "BadProof": "此证明尚未匹配当前分红。最新一周可能仍在等待期。",
       "NothingToClaim": "没有新的可领取：这个钱包已全部领取。",
-      "OverOwed": "分红合约拒绝了此次领取。请告诉我们。"
+      "OverOwed": "分红合约拒绝了此次领取。请告诉我们。",
+      "ClaimClosed": "本周的领取期限已过。未领取的部分已退回 Fly Desk。"
     }
   },
   "odds": {
