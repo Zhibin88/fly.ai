@@ -501,7 +501,8 @@
   function renderLaunches(raw) {
     const live = raw && !Array.isArray(raw);
     const items = (live ? raw.items : raw) || [];
-    const logo = (u) => (u && u.startsWith("ipfs://") ? "https://ipfs.io/ipfs/" + u.slice(7) : "");
+    // our own pin's gateway first (2026-10-11: ipfs.io answered 429 and $TIPTOE showed no image), ipfs.io if it fails
+    const logo = (u) => (u && u.startsWith("ipfs://") ? "https://gateway.pinata.cloud/ipfs/" + u.slice(7) : "");
     const next = live && raw.next_at ? raw.next_at * 1000 - Date.now() : null;
     $("launch-next").textContent = next == null ? "" : next > 0
       ? t("launch.next", { d: Math.max(1, Math.round(next / 86400000)) }) : t("launch.ready");
@@ -515,7 +516,7 @@
       // the token itself (2026-10-10, the user: "show the address & price of the launched token and link to pons"):
       // its address (click copies, ↗ the explorer), its price, a button to trade it on Pons
       const addr = l.token ? `${l.token.slice(0, 6)}…${l.token.slice(-4)}` : "";
-      return `<li>` + (logo(l.logo) ? `<img class="lc-logo" src="${esc(logo(l.logo))}" alt="" loading="lazy">` : `<span class="lc-logo"></span>`) +
+      return `<li>` + (logo(l.logo) ? `<img class="lc-logo" src="${esc(logo(l.logo))}" alt="" loading="lazy" onerror="if(!this.dataset.f){this.dataset.f=1;this.src=this.src.replace('gateway.pinata.cloud','ipfs.io')}">` : `<span class="lc-logo"></span>`) +
         `<span class="lc-name">${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${name} ↗</a>` : name}</span>` +
         `<span class="lc-sub">${esc(when)}${l.swarm ? ` · ${esc(t("launch.voted", { n: l.swarm.wanted, of: l.swarm.of }))}` : ""}</span>` +
         (l.description ? `<span class="lc-desc">${esc(l.description)}</span>` : "") +
