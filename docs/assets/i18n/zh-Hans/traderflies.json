@@ -1954,5 +1954,27 @@
       "debut": "首秀",
       "noRecord": "—（角位，每场不是同一台机器人）"
     }
+  },
+  "grow": {
+    "title": "让这只苍蝇的份额变大",
+    "feedTitle": "喂养",
+    "on": "开",
+    "off": "关",
+    "feedText": "把每周的收益留在 Fly Desk 而不领取:每喂养 ${unit},份额 +1x(最多 {cap}x)。",
+    "fedSoFar": "已喂养:${usd} · 份额 x{x}",
+    "feedStart": "开始喂养",
+    "feedStop": "停止喂养",
+    "feedOnDone": "喂养已开启:下周的收益会留在 desk,让这只苍蝇成长。",
+    "feedOffDone": "喂养已关闭:收益会重新进入你的领取。",
+    "boostTitle": "加速",
+    "burned": "已销毁 {amount} $FLYAI",
+    "boostText": "为这只苍蝇销毁 $FLYAI:最近 28 天每销毁 {unit},份额 +1x(最多 {cap}x)。销毁的代币永久消失。",
+    "boostNow": "当前加速:x{x}",
+    "burn": "销毁 $FLYAI",
+    "approving": "请在钱包中批准…",
+    "boostDone": "已为这只苍蝇销毁 {amount} $FLYAI。",
+    "holderOnly": "只有这只苍蝇的持有者可以喂养或加速。",
+    "notHolder": "只有这只苍蝇的持有者可以这样做。",
+    "zero": "请输入数量。"
   }
 }

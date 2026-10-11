@@ -1956,5 +1956,27 @@
       "debut": "debut",
       "noRecord": "— (a corner, not one robot from fight to fight)"
     }
+  },
+  "grow": {
+    "title": "Grow this fly's share",
+    "feedTitle": "Feed",
+    "on": "On",
+    "off": "Off",
+    "feedText": "Leave its weekly payout in the Fly Desk instead of claiming it: every ${unit} fed adds +1x to its share (up to {cap}x).",
+    "fedSoFar": "Fed so far: ${usd} · share x{x}",
+    "feedStart": "Start feeding",
+    "feedStop": "Stop feeding",
+    "feedOnDone": "Feeding is on: next week's payout stays in the desk and grows this fly.",
+    "feedOffDone": "Feeding is off: payouts go to your claims again.",
+    "boostTitle": "Boost",
+    "burned": "{amount} $FLYAI burned",
+    "boostText": "Burn $FLYAI for this fly: every {unit} burned in the last 28 days adds +1x to its share (up to {cap}x). Burned tokens are gone for good.",
+    "boostNow": "Boost now: x{x}",
+    "burn": "Burn $FLYAI",
+    "approving": "Approve in your wallet…",
+    "boostDone": "Burned {amount} $FLYAI for this fly.",
+    "holderOnly": "Only this fly's holder can feed or boost it.",
+    "notHolder": "Only this fly's holder can do that.",
+    "zero": "Enter an amount."
   }
 }

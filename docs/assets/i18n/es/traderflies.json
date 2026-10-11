@@ -1956,5 +1956,27 @@
       "debut": "debut",
       "noRecord": "— (una esquina, no el mismo robot en cada pelea)"
     }
+  },
+  "grow": {
+    "title": "Haz crecer la parte de esta mosca",
+    "feedTitle": "Alimentar",
+    "on": "Sí",
+    "off": "No",
+    "feedText": "Deja su pago semanal en el Fly Desk en vez de cobrarlo: cada ${unit} alimentados suma +1x a su parte (hasta {cap}x).",
+    "fedSoFar": "Alimentado: ${usd} · parte x{x}",
+    "feedStart": "Empezar a alimentar",
+    "feedStop": "Dejar de alimentar",
+    "feedOnDone": "Alimentación activada: el pago de la próxima semana se queda en el desk y hace crecer esta mosca.",
+    "feedOffDone": "Alimentación desactivada: los pagos vuelven a tus cobros.",
+    "boostTitle": "Impulso",
+    "burned": "{amount} $FLYAI quemados",
+    "boostText": "Quema $FLYAI para esta mosca: cada {unit} quemados en los últimos 28 días suma +1x a su parte (hasta {cap}x). Los tokens quemados desaparecen para siempre.",
+    "boostNow": "Impulso actual: x{x}",
+    "burn": "Quemar $FLYAI",
+    "approving": "Aprueba en tu wallet…",
+    "boostDone": "Quemaste {amount} $FLYAI para esta mosca.",
+    "holderOnly": "Solo quien tiene esta mosca puede alimentarla o impulsarla.",
+    "notHolder": "Solo quien tiene esta mosca puede hacer eso.",
+    "zero": "Escribe una cantidad."
   }
 }

@@ -1956,5 +1956,27 @@
       "debut": "ilk dövüş",
       "noRecord": "— (köşe: her dövüşte aynı robot değil)"
     }
+  },
+  "grow": {
+    "title": "Bu sineğin payını büyüt",
+    "feedTitle": "Besle",
+    "on": "Açık",
+    "off": "Kapalı",
+    "feedText": "Haftalık ödemesini almak yerine Fly Desk'te bırak: beslenen her ${unit} payına +1x ekler (en fazla {cap}x).",
+    "fedSoFar": "Şu ana kadar beslenen: ${usd} · pay x{x}",
+    "feedStart": "Beslemeye başla",
+    "feedStop": "Beslemeyi durdur",
+    "feedOnDone": "Besleme açık: gelecek haftanın ödemesi desk'te kalır ve bu sineği büyütür.",
+    "feedOffDone": "Besleme kapalı: ödemeler yine taleplerine gider.",
+    "boostTitle": "Güçlendir",
+    "burned": "{amount} $FLYAI yakıldı",
+    "boostText": "Bu sinek için $FLYAI yak: son 28 günde yakılan her {unit} payına +1x ekler (en fazla {cap}x). Yakılan tokenlar sonsuza dek gider.",
+    "boostNow": "Şu anki güç: x{x}",
+    "burn": "$FLYAI yak",
+    "approving": "Cüzdanında onayla…",
+    "boostDone": "Bu sinek için {amount} $FLYAI yakıldı.",
+    "holderOnly": "Bu sineği yalnızca sahibi besleyebilir veya güçlendirebilir.",
+    "notHolder": "Bunu yalnızca bu sineğin sahibi yapabilir.",
+    "zero": "Bir miktar gir."
   }
 }

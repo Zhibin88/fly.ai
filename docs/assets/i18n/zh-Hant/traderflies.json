@@ -1954,5 +1954,27 @@
       "debut": "首秀",
       "noRecord": "—（角位，每場不是同一台機器人）"
     }
+  },
+  "grow": {
+    "title": "讓這隻蒼蠅的份額變大",
+    "feedTitle": "餵養",
+    "on": "開",
+    "off": "關",
+    "feedText": "把每週的收益留在 Fly Desk 而不領取:每餵養 ${unit},份額 +1x(最多 {cap}x)。",
+    "fedSoFar": "已餵養:${usd} · 份額 x{x}",
+    "feedStart": "開始餵養",
+    "feedStop": "停止餵養",
+    "feedOnDone": "餵養已開啟:下週的收益會留在 desk,讓這隻蒼蠅成長。",
+    "feedOffDone": "餵養已關閉:收益會重新進入你的領取。",
+    "boostTitle": "加速",
+    "burned": "已銷毀 {amount} $FLYAI",
+    "boostText": "為這隻蒼蠅銷毀 $FLYAI:最近 28 天每銷毀 {unit},份額 +1x(最多 {cap}x)。銷毀的代幣永久消失。",
+    "boostNow": "目前加速:x{x}",
+    "burn": "銷毀 $FLYAI",
+    "approving": "請在錢包中批准…",
+    "boostDone": "已為這隻蒼蠅銷毀 {amount} $FLYAI。",
+    "holderOnly": "只有這隻蒼蠅的持有者可以餵養或加速。",
+    "notHolder": "只有這隻蒼蠅的持有者可以這樣做。",
+    "zero": "請輸入數量。"
   }
 }
