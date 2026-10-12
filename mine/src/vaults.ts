@@ -79,6 +79,10 @@ export function createVaults(d: VaultsDeps) {
     slots: Number(d.env.PROMO_SLOTS ?? "10"),
     // the Ruyui wallets' own slots in the same round (2026-10-05, the user: "5 for us and 5 for the ruyui")
     ruyuiSlots: Number(d.env.PROMO_RUYUI_SLOTS ?? "0"),
+    // partner collections' own slots, "<partner id>:<n>,..." (2026-10-12, the user: "5 only for the Bullas nft
+    // holders"): their wallets compete under the partner's book "p_<id>" (partners.ts)
+    partnerSlots: Object.fromEntries((d.env.PROMO_PARTNER_SLOTS ?? "").split(",").map((x) => x.trim().split(":"))
+      .filter(([id, n]) => /^[a-z0-9_]+$/.test(id ?? "") && Number(n) > 0).map(([id, n]) => [`p_${id}`, Number(n)])) as Record<string, number>,
     minUsd: Number(d.env.PROMO_MIN_USD ?? "20"),
     bonusUsd: Number(d.env.PROMO_BONUS_USD ?? "20"),
     holdDays: Number(d.env.PROMO_HOLD_DAYS ?? "14"),
@@ -438,12 +442,17 @@ export function createVaults(d: VaultsDeps) {
   const promoPublic = () => cached("promo", BOARD_TTL_MS, async () => {
     const taken = PROMO.on ? await promoTaken(pg, "robinhood") : 0;
     const rtaken = PROMO.on && PROMO.ruyuiSlots ? await promoTaken(pg, "ruyui") : 0;
+    const partners: Record<string, { slots: number; taken: number; left: number }> = {};
+    for (const [book, slots] of Object.entries(PROMO.partnerSlots)) {
+      const n = PROMO.on ? await promoTaken(pg, book) : 0;
+      partners[book.slice(2)] = { slots, taken: n, left: Math.max(0, slots - n) };
+    }
     return { on: PROMO.on, slots: PROMO.slots, taken, left: Math.max(0, PROMO.slots - taken), min_usd: PROMO.minUsd,
              bonus_usd: PROMO.bonusUsd, hold_days: PROMO.holdDays, start_ms: PROMO.startMs,
-             ruyui: { slots: PROMO.ruyuiSlots, taken: rtaken, left: Math.max(0, PROMO.ruyuiSlots - rtaken) } };
+             ruyui: { slots: PROMO.ruyuiSlots, taken: rtaken, left: Math.max(0, PROMO.ruyuiSlots - rtaken) }, partners };
   });
   const promoChanged = () => boards.delete("promo");
-  /** This round's rows not rejected, for the Fly Wallets ("robinhood") or the Ruyui wallets ("ruyui"). */
+  /** This round's rows not rejected, for the Fly Wallets ("robinhood"), the Ruyui wallets ("ruyui") or a partner's ("p_<id>"). */
   async function promoTaken(q: { one: typeof pg.one }, chain: string): Promise<number> {
     return (await q.one<{ n: number }>("select count(*)::int as n from mine.vault_promos where status <> 'rejected' and round_ms = ? and chain = ?",
       PROMO.startMs, chain))?.n ?? 0;
@@ -460,7 +469,7 @@ export function createVaults(d: VaultsDeps) {
     if (!PROMO.startMs || Date.now() < PROMO.startMs) return;
     let added = 0;
     await pg.tx(async (q) => {
-      for (const [chain, slots] of [["robinhood", PROMO.slots], ["ruyui", PROMO.ruyuiSlots]] as const) {
+      for (const [chain, slots] of [["robinhood", PROMO.slots], ["ruyui", PROMO.ruyuiSlots], ...Object.entries(PROMO.partnerSlots)] as [string, number][]) {
         let taken = await promoTaken(q, chain);
         if (taken >= slots) continue;
         const rows = await q.all<{ wallet: string; holder: string; at_ms: number; run: number; fly_id: number | null }>(`

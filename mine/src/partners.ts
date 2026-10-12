@@ -49,7 +49,9 @@ type Ledger = { holder: string | null; principal_usd: number; locked_usd: number
 export type Partner = {
   id: string; name: string; on: boolean; book: string;
   collection: { chain: string; chain_id: number; rpc: string; contract: string; first_id: number; last_id: number;
-                explorer?: string; image?: string; url?: string; x?: string };
+                explorer?: string; image?: string; url?: string; x?: string;
+                /** OpenSea's chain slug for the per-token art (artOf), when it isn't the chain's name */
+                opensea_chain?: string };
   fee_bps: number; partner_fee_to: string | null; partner_share: number; hold_flyai: number;
   /** the partner's own house token on Robinhood Chain (the house option buys its dips instead of FLYAI); null: FLYAI */
   house_token: { address: string; symbol: string } | null;
@@ -88,7 +90,8 @@ export function parsePartner(row: { id: string; name: string; on: boolean; confi
     id, name: String(row.name || id), on: !!row.on, book: `p_${id}`,
     collection: { chain: String(col.chain ?? ""), chain_id: Number(col.chain_id ?? 0), rpc: String(col.rpc),
                   contract: checksumAddress(String(col.contract)), first_id: first, last_id: last,
-                  ...(col.explorer ? { explorer: String(col.explorer) } : {}), ...(col.image ? { image: String(col.image) } : {}),
+                  ...(col.explorer ? { explorer: String(col.explorer) } : {}),
+                  ...(col.opensea_chain ? { opensea_chain: String(col.opensea_chain) } : {}), ...(col.image ? { image: String(col.image) } : {}),
                   ...(col.url ? { url: String(col.url) } : {}), ...(col.x ? { x: String(col.x) } : {}) },
     fee_bps: fee, partner_fee_to: feeTo ? checksumAddress(String(feeTo)) : null, partner_share: share, hold_flyai: hold,
     house_token: htAddress ? { address: checksumAddress(String(htAddress)), symbol: String((typeof ht === "object" && ht?.symbol) || "TOKEN") } : null,
@@ -379,6 +382,76 @@ export function createPartners(d: PartnersDeps) {
     return { saved: summary(p), on: !!row.on };
   }
 
+  // ---- each NFT's own art (2026-10-12, the user: "the bullas ... show the collection's icon to all of them") ---------
+  // From OpenSea (OPENSEA_API_KEY; the Bullas metadata on IPFS isn't served by the public gateways), cached hard as
+  // its API is rate-limited (the user: "it has limits, so use caching"): the whole collection is listed (200 a page)
+  // at most once a day and kept in vault_public "art:<book>", so a restart reads the database, not OpenSea; a token
+  // the listing missed is read on its own once (a miss is remembered for a day too). A failed listing waits 30 min.
+  const OPENSEA_CHAINS: Record<string, string> = { berachain: "bera_chain", ethereum: "ethereum", base: "base",
+    arbitrum: "arbitrum", abstract: "abstract", polygon: "matic", bsc: "bsc", apechain: "ape_chain" };
+  const ART_TTL_MS = 86_400_000, ART_RETRY_MS = 30 * 60_000, ART_SAVE_MS = 5 * 60_000;
+  type Art = { urls: Map<number, string | null>; missAt: Map<number, number>; listedAt: number; triedAt: number;
+               loading: Promise<void> | null; listing: Promise<void> | null; savedAt: number; dirty: boolean };
+  const arts = new Map<string, Art>();
+  async function opensea(path: string): Promise<any> {
+    const key = d.env.OPENSEA_API_KEY;
+    if (!key) throw new Error("no OPENSEA_API_KEY");
+    const r = await fetch(`https://api.opensea.io/api/v2${path}`, { headers: { "x-api-key": key }, signal: AbortSignal.timeout(20_000) });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(`opensea ${r.status}`);
+    return r.json();
+  }
+  const imageOf = (n: any): string | null => {
+    const u = String(n?.display_image_url || n?.image_url || "");
+    return /^https:\/\//.test(u) ? u : null;
+  };
+  async function saveArt(p: Partner, art: Art): Promise<void> {
+    art.savedAt = Date.now(); art.dirty = false;
+    const urls = Object.fromEntries([...art.urls].filter(([, u]) => u));
+    await pg.run(`insert into mine.vault_public (key, value, updated_at) values (?, ?::text::jsonb, now())
+      on conflict (key) do update set value = excluded.value, updated_at = now()`,
+      `art:${p.book}`, JSON.stringify({ listed_at: art.listedAt, urls }));
+  }
+  async function artOf(p: Partner, ids: number[]): Promise<Record<number, string | null>> {
+    const c = p.collection, chain = c.opensea_chain ?? OPENSEA_CHAINS[c.chain] ?? c.chain;
+    const base = `/chain/${chain}/contract/${c.contract.toLowerCase()}/nfts`;
+    let art = arts.get(p.id);
+    if (!art) {
+      const a: Art = art = { urls: new Map(), missAt: new Map(), listedAt: 0, triedAt: 0, loading: null, listing: null, savedAt: 0, dirty: false };
+      arts.set(p.id, a);
+      a.loading = publicOf(`art:${p.book}`).then((v) => {
+        for (const [k, u] of Object.entries(v?.urls ?? {})) a.urls.set(Number(k), String(u));
+        a.listedAt = Number(v?.listed_at ?? 0);
+      }).catch(() => {});
+    }
+    const a = art;
+    await a.loading;
+    const now = Date.now();
+    if (!a.listing && now - a.listedAt > ART_TTL_MS && now - a.triedAt > ART_RETRY_MS && d.env.OPENSEA_API_KEY) {
+      a.triedAt = now;
+      a.listing = (async () => {
+        let next: string | null = null;
+        for (let page = 0; page < 200; page++) {
+          const r = await opensea(`${base}?limit=200${next ? `&next=${encodeURIComponent(next)}` : ""}`);
+          for (const n of r?.nfts ?? []) { const u = imageOf(n); if (u) a.urls.set(Number(n.identifier), u); }
+          if (!(next = r?.next ?? null)) break;
+        }
+        a.listedAt = Date.now();
+        await saveArt(p, a);
+      })().catch((e) => console.error(`partner ${p.id} art: ${String(e).slice(0, 200)}`)).finally(() => { a.listing = null; });
+    }
+    // the page's own tokens the listing doesn't have (yet): read alone, a few per call, each at most once a day
+    const missing = ids.filter((n) => !a.urls.has(n) && now - (a.missAt.get(n) ?? 0) > ART_TTL_MS).slice(0, 6);
+    if (missing.length && d.env.OPENSEA_API_KEY) {
+      await Promise.all(missing.map(async (n) => {
+        a.missAt.set(n, now);
+        try { const u = imageOf((await opensea(`${base}/${n}`))?.nft); if (u) { a.urls.set(n, u); a.dirty = true; } } catch { /* collection image */ }
+      }));
+      if (a.dirty && !a.listing && now - a.savedAt > ART_SAVE_MS) void saveArt(p, a).catch(() => {});
+    }
+    return Object.fromEntries(ids.map((n) => [n, a.urls.get(n) ?? null]));
+  }
+
   // ---- routes ----------------------------------------------------------------------------------------------------
   async function route(req: IncomingMessage, res: ServerResponse, url: URL): Promise<boolean> {
     const p = url.pathname;
@@ -396,6 +469,11 @@ export function createPartners(d: PartnersDeps) {
         if ((r = /^\/token\/(\d{1,7})$/.exec(rest))) return d.send(res, 200, await tokenView(pa, tokenOf(pa, r[1]))), true;
         if ((r = /^\/wallet\/(0x[0-9a-fA-F]{40})$/.exec(rest))) return d.send(res, 200, await tokenView(pa, (await partnerWallet(pa, r[1])).n)), true;
         if ((r = /^\/holder\/(0x[0-9a-fA-F]{40})$/.exec(rest))) return d.send(res, 200, await holderView(pa, r[1])), true;
+        if (rest === "/art") {                        // ?ids=1,2,3 -> {art: {id: image url | null}}
+          const ids = [...new Set((url.searchParams.get("ids") ?? "").split(",").filter((x) => /^\d{1,7}$/.test(x)).map(Number))]
+            .filter((n) => n >= pa.collection.first_id && n <= pa.collection.last_id).slice(0, 60);
+          return d.send(res, 200, { art: await artOf(pa, ids) }), true;
+        }
         if (rest === "/leaderboard") return d.send(res, 200, (await publicOf(`leaderboard:${pa.book}`)) ?? { all: [], d7: [], h24: [] }), true;
         if (rest === "/pool") {
           return d.send(res, 200, (await publicOf(`${pa.book}:pool`)) ?? { partner: pa.id, mode: pa.pool.mode, asset: pa.pool.asset,
