@@ -188,7 +188,8 @@
       "lost": "Perdida",
       "split": "Dividida",
       "none": "Aún no hay apuestas abiertas.",
-      "noneSettled": "Aún no hay apuestas cerradas."
+      "noneSettled": "Aún no hay apuestas cerradas.",
+      "refund": "Reembolsada"
     },
     "markets": "{n} mercados",
     "title": "En otras cadenas",

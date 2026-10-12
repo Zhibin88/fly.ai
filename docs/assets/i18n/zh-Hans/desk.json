@@ -188,7 +188,8 @@
       "lost": "输",
       "split": "平分",
       "none": "还没有进行中的下注。",
-      "noneSettled": "还没有已结算的下注。"
+      "noneSettled": "还没有已结算的下注。",
+      "refund": "已退款"
     },
     "markets": "{n} 个市场",
     "title": "其他链上",

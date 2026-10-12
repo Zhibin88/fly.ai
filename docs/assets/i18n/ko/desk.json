@@ -188,7 +188,8 @@
       "lost": "실패",
       "split": "분할",
       "none": "아직 진행 중인 베팅이 없습니다.",
-      "noneSettled": "아직 정산된 베팅이 없습니다."
+      "noneSettled": "아직 정산된 베팅이 없습니다.",
+      "refund": "환불"
     },
     "markets": "마켓 {n}개",
     "title": "다른 체인에서",

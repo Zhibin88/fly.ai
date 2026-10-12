@@ -219,7 +219,7 @@
     : String(name).replace(/^fly:/, "Fly #"));
   /** Which chain a token is on: "base:BRETT" is Base, a bare ticker is Robinhood Chain (the desk's home). */
   const CHAIN_NAMES = { robinhood: "Robinhood", base: "Base", bsc: "BNB", solana: "Solana", arbitrum: "Arbitrum",
-                        abstract: "Abstract", poly: "Polymarket" };
+                        abstract: "Abstract", poly: "Polymarket", azuro: "Azuro" };
   /** readable names the desk sends for Polymarket shares ("question · outcome"), set on each render */
   let LABELS = {};
   const short = (s, n = 46) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
@@ -330,7 +330,7 @@
     // a chain shows when a fly holds or traded something there (or has bet history); empty rows are not sent
     const keys = Object.keys(cs).filter((k) => cs[k] && ((cs[k].books || []).length || (cs[k].tape || []).length ||
         (cs[k].bets || []).length || (cs[k].settled || []).length))
-      .sort((a, b) => (b === "poly" ? 1 : 0) - (a === "poly" ? 1 : 0));
+      .sort((a, b) => (cs[b].bets ? 1 : 0) - (cs[a].bets ? 1 : 0));   // (Polymarket, Azuro's sports bets since 2026-10-12)
     $("chains").hidden = !keys.length;
     const home = Object.values(cs).some((c) => c && c.home_only);   // entry.home_only: the flies buy Robinhood Chain only
     $("chains-note").hidden = !home;
@@ -368,9 +368,9 @@
       <td class="strong">${tok(x.symbol)}</td><td class="r">${usd(x.stake)}</td><td class="r">${pct(x.odds)}</td>
       <td class="r strong">${usd(x.pays)}</td><td class="r">${pct(x.now)}</td></tr>`).join("");
     const done = (c.settled || []).slice(0, 12).map((x) => {
-      const won = x.payout >= 1, split = x.payout > 0 && x.payout < 1;
+      const won = x.payout >= 1, split = x.payout > 0 && x.payout < 1, back = !!x.refund;   // (a cancelled game: stake back)
       return `<tr><td>${esc(time(x.at))}</td><td><span class="swatch" style="background:${flyColor(x.book)}"></span>${esc(bookLabel(x.book))}</td>
-        <td class="strong">${tok(x.symbol)}</td><td class="${won ? "up" : split ? "" : "down"}">${esc(t(won ? "chains.bets.won" : split ? "chains.bets.split" : "chains.bets.lost"))}</td>
+        <td class="strong">${tok(x.symbol)}</td><td class="${won ? "up" : split || back ? "" : "down"}">${esc(t(won ? "chains.bets.won" : back ? "chains.bets.refund" : split ? "chains.bets.split" : "chains.bets.lost"))}</td>
         <td class="r">${usd(x.cost_usd)}</td><td class="r strong">${usd(x.usd)}</td></tr>`;
     }).join("");
     return `<h3 class="chain-h">${chainTag(k)} ${esc(t("chains.markets", { n: nf(0).format(c.markets || 0) }))}` +

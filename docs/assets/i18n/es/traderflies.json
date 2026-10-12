@@ -1137,7 +1137,7 @@
     "withdraw": "Retirar",
     "share": "Parte a retirar",
     "preview": "Recibes {out}: {fee} es la comisión sobre {profit} de ganancia.",
-    "inKind": "Se paga en $FLYAI: primero se vende la parte retirada de cada posición (en otras redes recibes su dólar; en Polymarket USDC.e y las acciones). El dinero bloqueado del FlightPass se queda.",
+    "inKind": "Se paga en $FLYAI: primero se vende la parte retirada de cada posición (en otras cadenas recibes su dólar). Una apuesta deportiva no se puede vender a mitad del partido: queda hasta su resultado y luego paga a la billetera. El dinero bloqueado del FlightPass se queda.",
     "withdrawGo": "Retirar {pct}%",
     "withdrawConfirm": "¿Retirar el {pct}% de la wallet de esta mosca? Recibes unos {out} en $FLYAI, tras una comisión de {fee}. Antes se vende esa parte de cada posición.",
     "withdrawConfirmBonus": "Tu bono de depósito de {usd} vuelve a la casa.",
@@ -1183,7 +1183,7 @@
       "memes": "Memes",
       "majors": "Majors (ETH, BTC…)",
       "stocks": "Tokens de acciones",
-      "polymarket": "Polymarket"
+      "polymarket": "Apuestas deportivas"
     },
     "theFly": "El cerebro de la mosca",
     "brainOn": "El cerebro opera",
@@ -1252,8 +1252,8 @@
         "blurb": "Efectivo prestado en Robinhood Chain."
       },
       "poly": {
-        "title": "Apuestas en Polymarket",
-        "blurb": "Apuesta en Polymarket por los favoritos menos probables que la IA de Fly Desk valora muy por encima de su precio, en mercados que cierran en uno o dos días, y mantiene cada apuesta hasta el resultado. Se paga con el dinero de esta billetera vía Relay y las ganancias vuelven directamente."
+        "title": "Apuestas deportivas",
+        "blurb": "Apuestas en partidos de deportes y esports que empiezan en un día más o menos (en Azuro), donde la IA del Fly Desk ve un lado muy por encima de sus cuotas, mantenidas hasta el resultado final. Se pagan con el dinero de esta billetera vía Relay y las ganancias vuelven directamente."
       }
     },
     "params": {
@@ -1706,7 +1706,7 @@
       "memes": "Memecoins y tokens nuevos en Robinhood Chain. Los mayores movimientos y el mayor riesgo.",
       "majors": "Monedas grandes como ETH y BTC. Se mueven menos que los memes.",
       "stocks": "Acciones tokenizadas en Robinhood Chain, como NVDA o TSLA. Más tranquilas que las monedas.",
-      "polymarket": "Mercados de predicción. Se operan en su propia pestaña de Polymarket."
+      "polymarket": "Apuestas de deportes y esports en Azuro: cada una se mantiene hasta que se resuelve el partido."
     },
     "brain": "Deja operar al cerebro conectoma de la mosca. Elige solo qué comprar y vender.",
     "brainShare": "Cuánto del dinero de la wallet opera el cerebro, en %. El resto va a las opciones que actives.",

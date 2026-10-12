@@ -1137,7 +1137,7 @@
     "withdraw": "Withdraw",
     "share": "Share to withdraw",
     "preview": "You take {out}: {fee} of it is the fee on {profit} profit.",
-    "inKind": "Paid in $FLYAI: the withdrawn share of every position is sold first (on other chains you get their dollar; on Polymarket USDC.e and the shares). The locked FlightPass money stays.",
+    "inKind": "Paid in $FLYAI: the withdrawn share of every position is sold first (on other chains you get their dollar). A sports bet can't be sold mid-game: it stays until its result, then pays into the wallet. The locked FlightPass money stays.",
     "withdrawGo": "Withdraw {pct}%",
     "withdrawConfirm": "Withdraw {pct}% of this fly's wallet? You get about {out} in $FLYAI, after a {fee} fee. That share of every position is sold first.",
     "withdrawConfirmBonus": "Your {usd} deposit bonus goes back to the house.",
@@ -1183,7 +1183,7 @@
       "memes": "Memes",
       "majors": "Majors (ETH, BTC…)",
       "stocks": "Stock tokens",
-      "polymarket": "Polymarket"
+      "polymarket": "Sports bets"
     },
     "theFly": "The fly's brain",
     "brainOn": "The brain trades",
@@ -1252,8 +1252,8 @@
         "blurb": "Cash lent on Robinhood Chain."
       },
       "poly": {
-        "title": "Polymarket bets",
-        "blurb": "Bets on Polymarket underdogs that the Fly Desk's AI rates well above their price, in markets that close within a day or two, and holds each bet to the result. Paid from this wallet's money through Relay, winnings come straight back."
+        "title": "Sports bets",
+        "blurb": "Bets on sports and esports games starting within a day or so (on Azuro), where the Fly Desk's AI rates a side well above its odds, held to the final result. Paid from this wallet's money through Relay, winnings come straight back."
       }
     },
     "params": {
@@ -1706,7 +1706,7 @@
       "memes": "Meme coins and new tokens on Robinhood Chain. The biggest swings and the biggest risk.",
       "majors": "Large coins like ETH and BTC. They move less than memes.",
       "stocks": "Tokenized stocks on Robinhood Chain, like NVDA or TSLA. Calmer than coins.",
-      "polymarket": "Prediction markets. They trade on their own Polymarket tab."
+      "polymarket": "Sports and esports bets on Azuro: each one is held until its game is settled."
     },
     "brain": "Lets the fly's connectome brain trade. It picks what to buy and sell by itself.",
     "brainShare": "How much of the wallet's money the brain trades with, in %. The rest goes to the options you switch on.",

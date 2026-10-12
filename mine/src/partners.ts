@@ -46,12 +46,16 @@ const SUGGESTED_GAS_ETH = 0.0005;
 const RULES = ["equal"];                  // flytrade/vaults/ruyuirules.py RULES
 
 type Ledger = { holder: string | null; principal_usd: number; locked_usd: number; closing: boolean };
+export type Extra = { name: string; contract: string; first_id: number; last_id: number; offset: number; image?: string; url?: string; x?: string };
 export type Partner = {
   id: string; name: string; on: boolean; book: string;
   collection: { chain: string; chain_id: number; rpc: string; contract: string; first_id: number; last_id: number;
                 explorer?: string; image?: string; url?: string; x?: string;
                 /** OpenSea's chain slug for the per-token art (artOf), when it isn't the chain's name */
-                opensea_chain?: string };
+                opensea_chain?: string;
+                /** more collections of the project on the same chain (2026-10-12: Booga Bullas with the Bullas, "in one
+                 *  place together"): their token n is our id offset + n (wallets, books, pot); partner.py extra */
+                extra: Extra[] };
   fee_bps: number; partner_fee_to: string | null; partner_share: number; hold_flyai: number;
   /** the partner's own house token on Robinhood Chain (the house option buys its dips instead of FLYAI); null: FLYAI */
   house_token: { address: string; symbol: string } | null;
@@ -71,6 +75,18 @@ export function parsePartner(row: { id: string; name: string; on: boolean; confi
   const first = Number(col.first_id ?? 1), last = Number(col.last_id ?? 0);
   if (!Number.isInteger(first) || !Number.isInteger(last) || first < 0 || first > last || last >= MAX_ID) {
     throw new Error(`collection ids must be 0 <= first_id <= last_id < ${MAX_ID}`);
+  }
+  const extra: Extra[] = [], spans: [number, number][] = [[first, last]];
+  for (const e of Array.isArray(col.extra) ? col.extra : []) {
+    const f = Number(e?.first_id ?? 1), l = Number(e?.last_id ?? 0), off = Number(e?.offset ?? 0);
+    if (!ADDRESS.test(String(e?.contract ?? "")) || ![f, l, off].every(Number.isInteger) || f < 0 || f > l || off <= 0 || off + l >= MAX_ID) {
+      throw new Error(`collection.extra needs contract, 0 <= first_id <= last_id, offset > 0, offset + last_id < ${MAX_ID}`);
+    }
+    if (spans.some(([a, b]) => off + f <= b && a <= off + l)) throw new Error(`collection.extra offset ${off} overlaps another collection's ids`);
+    spans.push([off + f, off + l]);
+    extra.push({ name: String(e.name || row.name || id), contract: checksumAddress(String(e.contract)), first_id: f, last_id: l, offset: off,
+                 ...(e.image ? { image: String(e.image) } : {}), ...(e.url ? { url: String(e.url) } : {}),
+                 ...(e.x ? { x: String(e.x).replace(/^@/, "") } : {}) });
   }
   const feeTo = c.partner_fee_to ?? null;
   if (feeTo !== null && !ADDRESS.test(String(feeTo))) throw new Error("partner_fee_to must be an address or null");
@@ -92,7 +108,7 @@ export function parsePartner(row: { id: string; name: string; on: boolean; confi
                   contract: checksumAddress(String(col.contract)), first_id: first, last_id: last,
                   ...(col.explorer ? { explorer: String(col.explorer) } : {}),
                   ...(col.opensea_chain ? { opensea_chain: String(col.opensea_chain) } : {}), ...(col.image ? { image: String(col.image) } : {}),
-                  ...(col.url ? { url: String(col.url) } : {}), ...(col.x ? { x: String(col.x) } : {}) },
+                  ...(col.url ? { url: String(col.url) } : {}), ...(col.x ? { x: String(col.x) } : {}), extra },
     fee_bps: fee, partner_fee_to: feeTo ? checksumAddress(String(feeTo)) : null, partner_share: share, hold_flyai: hold,
     house_token: htAddress ? { address: checksumAddress(String(htAddress)), symbol: String((typeof ht === "object" && ht?.symbol) || "TOKEN") } : null,
     wallets: { on: (c.wallets?.on ?? true) !== false }, pool,
@@ -102,6 +118,18 @@ export function parsePartner(row: { id: string; name: string; on: boolean; confi
 const word = (v: bigint | number | string) =>
   typeof v === "string" ? v.replace(/^0x/, "").toLowerCase().padStart(64, "0") : BigInt(v).toString(16).padStart(64, "0");
 const ZERO = "0x0000000000000000000000000000000000000000";
+
+/** Every collection of a partner, the main one first (offset 0). */
+export function partsOf(p: Partner): Extra[] {
+  const c = p.collection;
+  return [{ name: p.name, contract: c.contract, first_id: c.first_id, last_id: c.last_id, offset: 0, image: c.image, url: c.url }, ...c.extra];
+}
+/** Our id -> its collection and its token id on that contract; null outside every collection. */
+export function locate(p: Partner, n: number): { part: Extra; token: number } | null {
+  if (!Number.isInteger(n)) return null;
+  for (const part of partsOf(p)) if (n - part.offset >= part.first_id && n - part.offset <= part.last_id) return { part, token: n - part.offset };
+  return null;
+}
 
 export function createPartners(d: PartnersDeps) {
   const { pg, HttpError } = d;
@@ -144,9 +172,7 @@ export function createPartners(d: PartnersDeps) {
   }
   const tokenOf = (p: Partner, raw: string) => {
     const n = Number(raw);
-    if (!Number.isInteger(n) || n < p.collection.first_id || n > p.collection.last_id) {
-      throw new HttpError(400, `${p.name} ids are ${p.collection.first_id}..${p.collection.last_id}`);
-    }
+    if (!locate(p, n)) throw new HttpError(400, `not a ${p.name} id`);
     return n;
   };
 
@@ -156,8 +182,10 @@ export function createPartners(d: PartnersDeps) {
     const k = `${p.id}:${n}`, hit = owners1.get(k);
     if (!fresh && hit && Date.now() - hit.at < OWNER_TTL_MS) return hit.owner;
     let owner: string | null;
+    const at = locate(p, n);
+    if (!at) return null;
     try {
-      const ret = await rpc(p.collection.rpc, "eth_call", [{ to: p.collection.contract, data: `${selector("ownerOf(uint256)")}${word(n)}` }, "latest"]) as string;
+      const ret = await rpc(p.collection.rpc, "eth_call", [{ to: at.part.contract, data: `${selector("ownerOf(uint256)")}${word(at.token)}` }, "latest"]) as string;
       owner = checksumAddress(`0x${ret.slice(-40)}`);
       if (owner === ZERO) owner = null;
     } catch (err) {
@@ -176,10 +204,12 @@ export function createPartners(d: PartnersDeps) {
     if (!s.byOwner || Date.now() - s.at >= OWNERS_TTL_MS) {
       s.loading ??= (async () => {
         try {
-          const ids: number[] = [];
-          for (let i = p.collection.first_id; i <= p.collection.last_id; i++) ids.push(i);
+          const ids: number[] = [], calls: { to: string; data: string }[] = [];
           const sel = selector("ownerOf(uint256)");
-          const out = await multicall(p.collection.rpc).batch(ids.map((i) => ({ to: p.collection.contract, data: `${sel}${word(i)}` })));
+          for (const part of partsOf(p)) {                // every collection, each token on its own contract
+            for (let i = part.first_id; i <= part.last_id; i++) { ids.push(part.offset + i); calls.push({ to: part.contract, data: `${sel}${word(i)}` }); }
+          }
+          const out = await multicall(p.collection.rpc).batch(calls);
           const byOwner = new Map<string, number[]>();
           out.forEach((ret, k) => {
             if (!ret || ret.length < 66) return;
@@ -240,7 +270,9 @@ export function createPartners(d: PartnersDeps) {
       id: p.id, name: p.name, book: p.book,
       collection: { chain: p.collection.chain, chain_id: p.collection.chain_id, contract: p.collection.contract,
                     first_id: p.collection.first_id, last_id: p.collection.last_id, explorer: p.collection.explorer ?? null,
-                    image: p.collection.image ?? null, url: p.collection.url ?? null, x: p.collection.x ?? null },
+                    image: p.collection.image ?? null, url: p.collection.url ?? null, x: p.collection.x ?? null,
+                    extra: p.collection.extra.map((e) => ({ name: e.name, contract: e.contract, first_id: e.first_id, last_id: e.last_id,
+                      offset: e.offset, image: e.image ?? null, url: e.url ?? null, x: e.x ?? null })) },
       fee_bps: p.fee_bps, hold_flyai: p.hold_flyai, house_token: p.house_token, wallets: { on: p.wallets.on },
       pool: { on: p.pool.on, mode: p.pool.mode, asset: p.pool.asset, fee_bps: p.pool.fee_bps, epoch_days: p.pool.epoch_days },
     };
@@ -390,7 +422,8 @@ export function createPartners(d: PartnersDeps) {
   const OPENSEA_CHAINS: Record<string, string> = { berachain: "bera_chain", ethereum: "ethereum", base: "base",
     arbitrum: "arbitrum", abstract: "abstract", polygon: "matic", bsc: "bsc", apechain: "ape_chain" };
   const ART_TTL_MS = 86_400_000, ART_RETRY_MS = 30 * 60_000, ART_SAVE_MS = 5 * 60_000;
-  type Art = { urls: Map<number, string | null>; missAt: Map<number, number>; listedAt: number; triedAt: number;
+  // urls by OUR id (offset + token, see locate); listedAt per contract (a collection added later gets listed at once)
+  type Art = { urls: Map<number, string | null>; missAt: Map<number, number>; listedAt: Map<string, number>; triedAt: number;
                loading: Promise<void> | null; listing: Promise<void> | null; savedAt: number; dirty: boolean };
   const arts = new Map<string, Art>();
   async function opensea(path: string): Promise<any> {
@@ -410,34 +443,38 @@ export function createPartners(d: PartnersDeps) {
     const urls = Object.fromEntries([...art.urls].filter(([, u]) => u));
     await pg.run(`insert into mine.vault_public (key, value, updated_at) values (?, ?::text::jsonb, now())
       on conflict (key) do update set value = excluded.value, updated_at = now()`,
-      `art:${p.book}`, JSON.stringify({ listed_at: art.listedAt, urls }));
+      `art:${p.book}`, JSON.stringify({ listed: Object.fromEntries(art.listedAt), urls }));
   }
   async function artOf(p: Partner, ids: number[]): Promise<Record<number, string | null>> {
     const c = p.collection, chain = c.opensea_chain ?? OPENSEA_CHAINS[c.chain] ?? c.chain;
-    const base = `/chain/${chain}/contract/${c.contract.toLowerCase()}/nfts`;
+    const base = (contract: string) => `/chain/${chain}/contract/${contract.toLowerCase()}/nfts`;
     let art = arts.get(p.id);
     if (!art) {
-      const a: Art = art = { urls: new Map(), missAt: new Map(), listedAt: 0, triedAt: 0, loading: null, listing: null, savedAt: 0, dirty: false };
+      const a: Art = art = { urls: new Map(), missAt: new Map(), listedAt: new Map(), triedAt: 0, loading: null, listing: null, savedAt: 0, dirty: false };
       arts.set(p.id, a);
       a.loading = publicOf(`art:${p.book}`).then((v) => {
         for (const [k, u] of Object.entries(v?.urls ?? {})) a.urls.set(Number(k), String(u));
-        a.listedAt = Number(v?.listed_at ?? 0);
+        for (const [k, at] of Object.entries(v?.listed ?? {})) a.listedAt.set(k.toLowerCase(), Number(at));
+        if (v?.listed_at) a.listedAt.set(c.contract.toLowerCase(), Number(v.listed_at));   // the first rows: the main collection only
       }).catch(() => {});
     }
     const a = art;
     await a.loading;
     const now = Date.now();
-    if (!a.listing && now - a.listedAt > ART_TTL_MS && now - a.triedAt > ART_RETRY_MS && d.env.OPENSEA_API_KEY) {
+    const stale = partsOf(p).filter((part) => now - (a.listedAt.get(part.contract.toLowerCase()) ?? 0) > ART_TTL_MS);
+    if (!a.listing && stale.length && now - a.triedAt > ART_RETRY_MS && d.env.OPENSEA_API_KEY) {
       a.triedAt = now;
       a.listing = (async () => {
-        let next: string | null = null;
-        for (let page = 0; page < 200; page++) {
-          const r = await opensea(`${base}?limit=200${next ? `&next=${encodeURIComponent(next)}` : ""}`);
-          for (const n of r?.nfts ?? []) { const u = imageOf(n); if (u) a.urls.set(Number(n.identifier), u); }
-          if (!(next = r?.next ?? null)) break;
+        for (const part of stale) {
+          let next: string | null = null;
+          for (let page = 0; page < 200; page++) {
+            const r = await opensea(`${base(part.contract)}?limit=200${next ? `&next=${encodeURIComponent(next)}` : ""}`);
+            for (const n of r?.nfts ?? []) { const u = imageOf(n); if (u) a.urls.set(part.offset + Number(n.identifier), u); }
+            if (!(next = r?.next ?? null)) break;
+          }
+          a.listedAt.set(part.contract.toLowerCase(), Date.now());
+          await saveArt(p, a);
         }
-        a.listedAt = Date.now();
-        await saveArt(p, a);
       })().catch((e) => console.error(`partner ${p.id} art: ${String(e).slice(0, 200)}`)).finally(() => { a.listing = null; });
     }
     // the page's own tokens the listing doesn't have (yet): read alone, a few per call, each at most once a day
@@ -445,7 +482,9 @@ export function createPartners(d: PartnersDeps) {
     if (missing.length && d.env.OPENSEA_API_KEY) {
       await Promise.all(missing.map(async (n) => {
         a.missAt.set(n, now);
-        try { const u = imageOf((await opensea(`${base}/${n}`))?.nft); if (u) { a.urls.set(n, u); a.dirty = true; } } catch { /* collection image */ }
+        const at = locate(p, n);
+        if (!at) return;
+        try { const u = imageOf((await opensea(`${base(at.part.contract)}/${at.token}`))?.nft); if (u) { a.urls.set(n, u); a.dirty = true; } } catch { /* collection image */ }
       }));
       if (a.dirty && !a.listing && now - a.savedAt > ART_SAVE_MS) void saveArt(p, a).catch(() => {});
     }
@@ -471,7 +510,7 @@ export function createPartners(d: PartnersDeps) {
         if ((r = /^\/holder\/(0x[0-9a-fA-F]{40})$/.exec(rest))) return d.send(res, 200, await holderView(pa, r[1])), true;
         if (rest === "/art") {                        // ?ids=1,2,3 -> {art: {id: image url | null}}
           const ids = [...new Set((url.searchParams.get("ids") ?? "").split(",").filter((x) => /^\d{1,7}$/.test(x)).map(Number))]
-            .filter((n) => n >= pa.collection.first_id && n <= pa.collection.last_id).slice(0, 60);
+            .filter((n) => locate(pa, n)).slice(0, 60);
           return d.send(res, 200, { art: await artOf(pa, ids) }), true;
         }
         if (rest === "/leaderboard") return d.send(res, 200, (await publicOf(`leaderboard:${pa.book}`)) ?? { all: [], d7: [], h24: [] }), true;

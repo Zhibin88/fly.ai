@@ -1135,7 +1135,7 @@
     "withdraw": "提现",
     "share": "提现比例",
     "preview": "你将取出 {out}：其中 {fee} 是对 {profit} 利润收取的手续费。",
-    "inKind": "以 $FLYAI 支付：先卖出每个仓位中提取的份额（其他链上为该链的美元；Polymarket 上为 USDC.e 和份额）。锁定的 FlightPass 资金保留。",
+    "inKind": "以 $FLYAI 支付：先卖出每个持仓的提取份额（在其他链上你会收到该链的美元）。体育投注不能在比赛中卖出：会保留到结果出来，然后支付到钱包。锁定的 FlightPass 资金保留。",
     "withdrawGo": "提现 {pct}%",
     "withdrawConfirm": "要提取这只苍蝇钱包的 {pct}% 吗？扣除 {fee} 手续费后，你将收到约 {out} 的 $FLYAI。会先卖出每个仓位的相应部分。",
     "withdrawConfirmBonus": "你的 {usd} 充值奖励将退回平台。",
@@ -1181,7 +1181,7 @@
       "memes": "Meme 币",
       "majors": "主流币（ETH、BTC…）",
       "stocks": "股票代币",
-      "polymarket": "Polymarket"
+      "polymarket": "体育投注"
     },
     "theFly": "苍蝇的大脑",
     "brainOn": "大脑参与交易",
@@ -1250,8 +1250,8 @@
         "blurb": "在 Robinhood Chain 上出借的现金。"
       },
       "poly": {
-        "title": "Polymarket 下注",
-        "blurb": "在一两天内收盘的市场里，押注 Fly Desk 的 AI 评估远高于其价格的 Polymarket 冷门结果，并持有到结果揭晓。用这个钱包的钱经 Relay 支付，赢的钱直接回来。"
+        "title": "体育投注",
+        "blurb": "在一天左右内开赛的体育和电竞比赛上投注（Azuro），当 Fly Desk 的 AI 认为某一方远高于其赔率时下注，并持有到最终结果。通过 Relay 用本钱包的资金支付，奖金直接返回。"
       }
     },
     "params": {
@@ -1704,7 +1704,7 @@
       "memes": "Robinhood Chain 上的 meme 币和新代币。波动最大，风险也最大。",
       "majors": "ETH、BTC 等大币。波动比 meme 小。",
       "stocks": "Robinhood Chain 上的代币化股票，如 NVDA、TSLA。比币更平稳。",
-      "polymarket": "预测市场。在单独的 Polymarket 标签里交易。"
+      "polymarket": "Azuro 上的体育和电竞投注：每注都持有到比赛结算。"
     },
     "brain": "让苍蝇的连接组大脑交易。它自己决定买卖什么。",
     "brainShare": "大脑用钱包里多少比例的资金交易（%）。其余分给你开启的选项。",

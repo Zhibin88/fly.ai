@@ -188,7 +188,8 @@
       "lost": "輸",
       "split": "平分",
       "none": "還沒有進行中的下注。",
-      "noneSettled": "還沒有已結算的下注。"
+      "noneSettled": "還沒有已結算的下注。",
+      "refund": "已退款"
     },
     "markets": "{n} 個市場",
     "title": "其他鏈上",

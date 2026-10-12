@@ -1137,7 +1137,7 @@
     "withdraw": "Çek",
     "share": "Çekilecek pay",
     "preview": "{out} alırsın: bunun {fee} kadarı {profit} kârın ücreti.",
-    "inKind": "$FLYAI olarak ödenir: önce her pozisyonun çekilen payı satılır (diğer ağlarda o ağın doları; Polymarket'te USDC.e ve paylar). Kilitli FlightPass parası kalır.",
+    "inKind": "$FLYAI olarak ödenir: önce her pozisyonun çekilen payı satılır (diğer zincirlerde o zincirin dolarını alırsın). Bir spor bahsi maç sırasında satılamaz: sonucuna kadar kalır, sonra cüzdana öder. Kilitli FlightPass parası kalır.",
     "withdrawGo": "%{pct} çek",
     "withdrawConfirm": "Bu sineğin cüzdanının %{pct}'ini çekmek istiyor musun? {fee} ücretten sonra yaklaşık {out} $FLYAI alırsın. Önce her pozisyonun o payı satılır.",
     "withdrawConfirmBonus": "{usd} yatırma bonusun kasaya geri döner.",
@@ -1183,7 +1183,7 @@
       "memes": "Memeler",
       "majors": "Büyükler (ETH, BTC…)",
       "stocks": "Hisse token'ları",
-      "polymarket": "Polymarket"
+      "polymarket": "Spor bahisleri"
     },
     "theFly": "Sineğin beyni",
     "brainOn": "Beyin işlem yapar",
@@ -1252,8 +1252,8 @@
         "blurb": "Robinhood Chain'de ödünç verilen nakit."
       },
       "poly": {
-        "title": "Polymarket bahisleri",
-        "blurb": "Fly Desk yapay zekasının fiyatının çok üzerinde değerlendirdiği Polymarket sürprizlerine, bir iki gün içinde kapanan piyasalarda bahis yapar ve her bahsi sonuca kadar tutar. Bu cüzdanın parasıyla Relay üzerinden ödenir, kazançlar doğrudan geri gelir."
+        "title": "Spor bahisleri",
+        "blurb": "Bir gün kadar içinde başlayan spor ve e-spor maçlarına bahisler (Azuro'da): Fly Desk'in yapay zekâsı bir tarafı oranının çok üstünde görürse oynar ve sonuca kadar tutar. Bu cüzdanın parasıyla Relay üzerinden ödenir, kazançlar doğrudan geri gelir."
       }
     },
     "params": {
@@ -1706,7 +1706,7 @@
       "memes": "Robinhood Chain'deki meme coinler ve yeni tokenlar. En büyük dalgalanma, en büyük risk.",
       "majors": "ETH ve BTC gibi büyük coinler. Memelerden daha az hareket eder.",
       "stocks": "Robinhood Chain'deki tokenleştirilmiş hisseler, NVDA veya TSLA gibi. Coinlerden daha sakin.",
-      "polymarket": "Tahmin piyasaları. Kendi Polymarket sekmesinde işlem görür."
+      "polymarket": "Azuro'da spor ve e-spor bahisleri: her biri maç sonuçlanana kadar tutulur."
     },
     "brain": "Sineğin konektom beyninin işlem yapmasına izin verir. Ne alıp satacağını kendisi seçer.",
     "brainShare": "Cüzdanın parasının yüzde kaçıyla beynin işlem yaptığı. Kalanı açtığın seçeneklere gider.",

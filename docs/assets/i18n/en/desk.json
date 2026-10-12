@@ -188,7 +188,8 @@
       "lost": "Lost",
       "split": "Split",
       "none": "No open bets yet.",
-      "noneSettled": "No bets settled yet."
+      "noneSettled": "No bets settled yet.",
+      "refund": "Refunded"
     },
     "markets": "{n} markets",
     "title": "On other chains",

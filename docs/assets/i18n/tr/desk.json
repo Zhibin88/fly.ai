@@ -188,7 +188,8 @@
       "lost": "Kaybetti",
       "split": "Bölündü",
       "none": "Henüz açık bahis yok.",
-      "noneSettled": "Henüz sonuçlanan bahis yok."
+      "noneSettled": "Henüz sonuçlanan bahis yok.",
+      "refund": "İade"
     },
     "markets": "{n} piyasa",
     "title": "Diğer zincirlerde",
